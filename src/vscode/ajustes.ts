@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import type { TarifasExtra } from '../core/precios/coste';
+import { tarifasValidas, type TarifasExtra } from '../core/precios/coste';
 
 export const SECCION = 'costkeeper';
 
@@ -10,6 +10,7 @@ export interface Ajustes {
   tarifasExtra: TarifasExtra;
   barraDeEstado: boolean;
   indexarAlAbrir: boolean;
+  excluirProyectos: string[];
 }
 
 export function leerAjustes(): Ajustes {
@@ -21,19 +22,8 @@ export function leerAjustes(): Ajustes {
     tarifasExtra: tarifasValidas(c.get<Record<string, unknown>>('tarifasExtra')),
     barraDeEstado: c.get<boolean>('barraDeEstado') ?? true,
     indexarAlAbrir: c.get<boolean>('indexarAlAbrir') ?? true,
+    excluirProyectos: (c.get<string[]>('excluirProyectos') ?? []).filter((r) => typeof r === 'string' && r.trim().length > 0),
   };
-}
-
-/** Una tarifa mal escrita en los ajustes no puede tumbar el panel. */
-function tarifasValidas(crudas: Record<string, unknown> | undefined): TarifasExtra {
-  const salida: TarifasExtra = {};
-  for (const [modelo, valor] of Object.entries(crudas ?? {})) {
-    const v = valor as { entrada?: unknown; salida?: unknown };
-    const entrada = numeroPositivo(v?.entrada);
-    const sal = numeroPositivo(v?.salida);
-    if (entrada > 0 || sal > 0) salida[modelo] = { entrada, salida: sal };
-  }
-  return salida;
 }
 
 function numeroPositivo(v: unknown): number {

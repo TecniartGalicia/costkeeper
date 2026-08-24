@@ -70,6 +70,25 @@ describe('CostKeeper · integración', () => {
     assert.ok(true);
   });
 
+  it('P-06 · dos indexados a la vez no se pisan', async function () {
+    this.timeout(60_000);
+    await extension();
+    await Promise.all([
+      vscode.commands.executeCommand('costkeeper.indexar'),
+      vscode.commands.executeCommand('costkeeper.indexar'),
+      vscode.commands.executeCommand('costkeeper.indexar'),
+    ]);
+    const filas = filasIndice();
+    const ids = new Set(filas.map((f) => (f as { id: string }).id));
+    assert.equal(ids.size, filas.length, 'no puede haber un id repetido en el índice');
+  });
+
+  it('el comando de tarifa está registrado', async () => {
+    await extension();
+    const todos = await vscode.commands.getCommands(true);
+    assert.ok(todos.includes('costkeeper.tarifa'));
+  });
+
   it('reindexar dos veces no duplica', async function () {
     this.timeout(60_000);
     await extension();

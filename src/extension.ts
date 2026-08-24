@@ -8,7 +8,9 @@ import { BarraEstado } from './ui/barraEstado';
 import { avisarPresupuestos, etiquetarCliente, exportarCsv, ponerPresupuesto, recorteGratis } from './pro/features';
 import { activateLicenseCommand, isPro, deactivateLicenseCommand } from './pro/licenseService';
 import { PRO_ACTIVO } from './pro/polarConfig';
-import { leerAjustes } from './vscode/ajustes';
+import { leerAjustes, SECCION } from './vscode/ajustes';
+import { agregar } from './core/consulta/agregar';
+import { modelosConTarifa, tarifaDe } from './core/precios/coste';
 
 export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
   // Mientras la extensión sea gratis, los comandos de licencia no salen en la paleta.
@@ -74,6 +76,44 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
   registrar('costkeeper.presupuesto', async () => {
     await estado.asegurarCargado();
     await ponerPresupuesto(ctx, estado);
+  });
+
+  registrar('costkeeper.tarifa', async () => {
+    await estado.asegurarCargado();
+    const ajustes = leerAjustes();
+    // Primero los modelos que aparecen en el índice y no tienen precio: son los
+    // que de verdad le faltan a este usuario.
+    const usados = agregar(estado.registros, 'modelo').map((f) => f.clave);
+    const sinTarifa = usados.filter((m) => !tarifaDe(m, ajustes.tarifasExtra));
+    const opciones = [
+      ...sinTarifa.map((m) => ({ label: m, description: l10n.t('no rate yet') })),
+      ...usados.filter((m) => !sinTarifa.includes(m)).map((m) => ({ label: m, description: l10n.t('already priced') })),
+      ...modelosConTarifa().filter((m) => !usados.includes(m)).map((m) => ({ label: m, description: l10n.t('not in your history') })),
+    ];
+    const modelo = await vscode.window.showQuickPick(opciones, {
+      title: l10n.t('Which model?'),
+      placeHolder: l10n.t('Rates are in USD per million tokens'),
+    });
+    if (!modelo) return;
+
+    const previa = tarifaDe(modelo.label, ajustes.tarifasExtra);
+    const numero = async (titulo: string, valor?: number) => {
+      const t = await vscode.window.showInputBox({
+        title: titulo,
+        value: valor !== undefined ? String(valor) : '',
+        ignoreFocusOut: true,
+        validateInput: (v) => (Number(v) > 0 ? undefined : l10n.t('Enter a number greater than zero')),
+      });
+      return t === undefined ? undefined : Number(t);
+    };
+    const entrada = await numero(l10n.t('Input, USD per million tokens'), previa?.entrada);
+    if (entrada === undefined) return;
+    const salida = await numero(l10n.t('Output, USD per million tokens'), previa?.salida);
+    if (salida === undefined) return;
+
+    const actuales = { ...ajustes.tarifasExtra, [modelo.label]: { entrada, salida } };
+    await vscode.workspace.getConfiguration(SECCION).update('tarifasExtra', actuales, vscode.ConfigurationTarget.Global);
+    void vscode.window.showInformationMessage(l10n.t('Rate saved for {0}. Costs are recalculated straight away.', modelo.label));
   });
 
   registrar('costkeeper.introducirLicencia', () => activateLicenseCommand(ctx));

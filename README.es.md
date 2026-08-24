@@ -37,13 +37,21 @@ Dos cosas más que no hace nadie:
 Todo lo de abajo es **gratis**. Hoy no hay versión de pago.
 
 - Claude Code y Codex en la misma tabla, con indexado incremental. 4 GB de histórico en unos 7 segundos; a partir de ahí, las actualizaciones son instantáneas.
-- Gasto por proyecto, modelo, día, rama y sesión, con los subagentes contados aparte.
+- Gasto por proyecto, modelo, día, rama y sesión; pincha cualquier fila y el panel entero se filtra por ella.
+- **Cuánto llevas respecto al periodo anterior**: los mismos días, justo antes, sin solaparse.
+- Las sesiones más caras, con su proyecto y su fecha en vez de un identificador ilegible.
+- Los subagentes se cuentan o no con un clic.
 - **Etiquetar un proyecto con un cliente**, y agrupar y exportar por cliente. El CSV está pensado para ir directo a una factura.
 - Presupuestos mensuales por proyecto, con aviso al 50, al 80 y al 100 %.
 - **La cuota de Codex tal como la publica Codex**: porcentaje usado, ventana, cuándo se reinicia y plan.
 - La ventana de cinco horas de Claude reconstruida a partir de las marcas de tiempo, etiquetada como deducida y a propósito sin porcentaje, porque ese dato no se puede saber.
 - Barra de estado con el gasto de hoy del proyecto abierto.
+- Buscador y «ver todas» en cada tabla, para que una cola larga de proyectos pequeños no quede invisible.
 - Histórico ilimitado.
+
+### Un apunte sobre las ramas
+
+Claude Code escribe `HEAD` en vez del nombre de la rama siempre que no consigue resolverla, y eso pasa incluso en repositorios que están en `main`, cuando la sesión no arrancó dentro del repositorio. CostKeeper no hace como que eso es una rama: cuenta esos mensajes como *sin rama* y te dice cuántos son. La vista por rama solo sirve para las sesiones abiertas dentro del repo.
 
 ## Dos cifras que nunca se mezclan
 

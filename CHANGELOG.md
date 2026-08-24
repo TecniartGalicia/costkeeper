@@ -5,6 +5,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-24
+
+The 0.1.x proved the numbers were right. This one is about being able to look at them: on a real history of 288 projects, the panel showed eight and let you click none.
+
+### Added
+
+- **Click any row to filter** the whole panel by that project, model, client or session, with a chip per active filter.
+- **Search and «show all»** in every table. On the reference history the top 8 projects hid 280 rows worth $8,203.
+- **Comparison with the previous period** — same number of days, immediately before, no overlap.
+- **Most expensive sessions**, identified by project and dates instead of a session id.
+- **Subagents toggle** in the panel.
+- **Automatic refresh**: every five minutes while the panel is visible, and when the window regains focus.
+- Command **Set the rate for a model**, which lists first the models in your history that have no price (Codex, typically) instead of asking you to write JSON by hand.
+- Setting `costkeeper.excluirProyectos` to keep scratch folders out of the view. The index keeps everything: removing the pattern brings the data back.
+
+### Changed
+
+- `HEAD` is no longer treated as a branch. Claude Code writes it when it cannot resolve one — on the reference history that was $28,148 of $29,127 in a single fake row. Those messages now count as «no branch», and the card says how many there are.
+- Rows below 1% of the total fold into an «others» row that always shows its amount. Exports never fold.
+
 ## [0.1.1] - 2026-08-24
 
 ### Fixed
@@ -26,6 +46,7 @@ First public preview.
 - Client tags, CSV export with a monthly summary, monthly budgets with notices at 50/80/100 %, quota forecast, unlimited history and per-branch reports. All free in this release; the licensing code ships behind a switch that is off.
 - English and Spanish.
 
-[Unreleased]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/TecniartGalicia/costkeeper/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/TecniartGalicia/costkeeper/releases/tag/v0.1.0

@@ -52,6 +52,26 @@ export function tokensDe(r: Registro): number {
   return r.entrada + r.salida + r.cacheLectura + r.cacheEscritura5m + r.cacheEscritura1h;
 }
 
+/**
+ * Limpia lo que venga de los ajustes: una tarifa mal escrita a mano no puede
+ * tumbar el panel ni, peor, colarse como un precio de cero.
+ */
+export function tarifasValidas(crudas: unknown): TarifasExtra {
+  const salida: TarifasExtra = {};
+  if (!crudas || typeof crudas !== 'object') return salida;
+  for (const [modelo, valor] of Object.entries(crudas as Record<string, unknown>)) {
+    const v = valor as { entrada?: unknown; salida?: unknown };
+    const entrada = positivo(v?.entrada);
+    const sal = positivo(v?.salida);
+    if (entrada > 0 || sal > 0) salida[modelo] = { entrada, salida: sal };
+  }
+  return salida;
+}
+
+function positivo(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0;
+}
+
 /** Lista de modelos con tarifa conocida, para el panel de ajustes. */
 export function modelosConTarifa(): string[] {
   return Object.keys(MODELOS).sort();

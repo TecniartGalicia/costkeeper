@@ -37,13 +37,21 @@ Two more things nobody else does:
 Everything below is **free**. There is no paid tier today.
 
 - Claude Code and Codex in the same table, indexed incrementally. 4 GB of history in about 7 seconds; after that, updates are instant.
-- Cost by project, model, day, branch and session — subagents counted separately.
+- Cost by project, model, day, branch and session — click any row to filter the whole panel by it.
+- **How you compare with the previous period**: same number of days, right before, no overlap.
+- The most expensive sessions, named by project and date rather than by an id nobody can read.
+- Subagents on or off with one click.
 - **Tag a project with a client**, then group and export by client. The CSV is meant to go straight into an invoice.
 - Monthly budgets per project, with a notice at 50, 80 and 100 %.
 - **Codex quota as published by Codex itself**: percentage used, window, reset time, plan.
 - Claude's 5-hour window reconstructed from timestamps — labelled as derived, and deliberately without a percentage, because that number cannot be known.
 - Status bar with today's spend for the open project.
+- Search and «show all» in every table, so a long tail of small projects is never invisible.
 - Unlimited history.
+
+### A note on branches
+
+Claude Code writes `HEAD` instead of the branch name whenever it cannot resolve one — which happens even in repositories sitting on `main`, when the session did not start inside the repository. CostKeeper does not pretend that is a branch: it counts those messages as *no branch* and tells you how many there are. The by-branch view is only useful for sessions started inside the repo.
 
 ## Two numbers, never mixed
 

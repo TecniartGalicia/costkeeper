@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { agregar, diaHace, resumir, serieDiaria, SIN } from '../../core/consulta/agregar';
-import { costeDe, tokensDe } from '../../core/precios/coste';
+import { agregar, casaPatron, diaHace, periodoAnterior, plegar, resumir, serieDiaria, sesiones, sinRama, SIN } from '../../core/consulta/agregar';
+import { costeDe, tarifasValidas, tokensDe } from '../../core/precios/coste';
 import { normalizarModelo, normalizarProyecto, nombreCortoProyecto } from '../../core/normalizar';
 import { cuotasCodexVigentes, minutosHastaAgotar, ventanaClaude } from '../../core/cuota';
 import { filasACsv, resumenACsv } from '../../core/exportar';
@@ -234,5 +234,114 @@ describe('presupuestos', () => {
   it('la clave de aviso cambia de mes', () => {
     const aviso = { proyecto: 'a', usd: 1, limite: 1, porCiento: 100, umbral: 100 as const };
     assert.notEqual(claveAviso(aviso, new Date(2026, 7, 1)), claveAviso(aviso, new Date(2026, 8, 1)));
+  });
+});
+
+describe('0.2.0 · mejoras del panel', () => {
+  const datos = [
+    reg({ proyecto: 'c:/x/uno', modelo: 'claude-opus-5', salida: 1e6, ts: '2026-08-20T10:00:00Z', rama: 'HEAD', sesion: 's1' }),
+    reg({ proyecto: 'c:/x/dos', modelo: 'claude-haiku-4-5', salida: 1e6, ts: '2026-08-21T10:00:00Z', rama: 'main', sesion: 's2' }),
+    reg({ proyecto: 'c:/x/uno', modelo: 'claude-opus-5', salida: 1e6, ts: '2026-08-22T10:00:00Z', rama: '', sesion: 's1', subagente: true }),
+  ];
+
+  it('P-01 · HEAD no es una rama: cae con las que faltan', () => {
+    const filas = agregar(datos, 'rama');
+    const sin = filas.find((f) => f.clave === SIN.rama);
+    assert.ok(sin, 'debe existir la cubeta de sin rama');
+    assert.equal(sin!.mensajes, 2, 'HEAD y la vacía van juntas');
+    assert.equal(sinRama(datos), 2);
+    assert.ok(filas.some((f) => f.clave === 'main'));
+  });
+
+  it('P-02 · los filtros se combinan y se quitan', () => {
+    const todo = resumir(datos).usd;
+    assert.equal(resumir(datos, { proyecto: 'c:/x/uno' }).usd, 50);
+    assert.equal(resumir(datos, { proyecto: 'c:/x/uno', modelo: 'claude-haiku-4-5' }).usd, 0);
+    assert.equal(resumir(datos, { sesion: 's2' }).usd, 5);
+    assert.equal(resumir(datos, {}).usd, todo, 'sin filtro vuelve el total');
+  });
+
+  it('P-02 · el filtro por cliente usa las etiquetas', () => {
+    const opciones = { clientes: { 'c:/x/uno': 'Acme' } };
+    assert.equal(resumir(datos, { cliente: 'Acme' }, opciones).usd, 50);
+    assert.equal(resumir(datos, { cliente: SIN.cliente }, opciones).usd, 5);
+  });
+
+  it('P-03 · los patrones de exclusión no se pasan de listos', () => {
+    assert.equal(casaPatron('c:/x/uno', 'uno'), true);
+    assert.equal(casaPatron('c:/x/uno', 'c:/x/*'), true);
+    assert.equal(casaPatron('c:/x/uno', 'c:/y/*'), false);
+    assert.equal(casaPatron('c:/x/uno', 'un'), true, 'el texto suelto casa en cualquier parte');
+    assert.equal(casaPatron('c:/x/uno', '*/dos'), false);
+    assert.equal(casaPatron('c:/x/uno', ''), false);
+    assert.equal(resumir(datos, { excluir: ['c:/x/uno'] }).usd, 5);
+  });
+
+  it('P-04 · el periodo anterior no se solapa ni deja hueco', () => {
+    const p = periodoAnterior({ desde: '2026-08-18', hasta: '2026-08-24' });
+    assert.deepEqual([p!.desde, p!.hasta], ['2026-08-11', '2026-08-17']);
+    assert.equal(periodoAnterior({ desde: '2026-08-18' }), undefined, 'sin rango cerrado no hay comparación');
+    assert.equal(periodoAnterior({}), undefined);
+  });
+
+  it('P-04 · el periodo anterior conserva los demás filtros', () => {
+    const p = periodoAnterior({ desde: '2026-08-18', hasta: '2026-08-24', proyecto: 'c:/x/uno' });
+    assert.equal(p!.proyecto, 'c:/x/uno');
+  });
+
+  it('P-05 · las sesiones traen proyecto y fechas, ordenadas por coste', () => {
+    const s = sesiones(datos);
+    assert.equal(s[0].clave, 's1');
+    assert.equal(s[0].usd, 50);
+    assert.equal(s[0].proyecto, 'c:/x/uno');
+    assert.equal(s[0].desdeDia, '2026-08-20');
+    assert.equal(s[0].hastaDia, '2026-08-22');
+  });
+
+  it('P-05 · una sesión sin fecha no rompe', () => {
+    const s = sesiones([reg({ ts: '', sesion: 'x', salida: 1000 })]);
+    assert.equal(s[0].desdeDia, '');
+    assert.equal(s[0].mensajes, 1);
+  });
+
+  it('P-07 · apagar los subagentes baja el total en lo que suman', () => {
+    const con = resumir(datos, { incluirSubagentes: true }).usd;
+    const sin = resumir(datos, { incluirSubagentes: false }).usd;
+    assert.equal(con - sin, 25);
+  });
+
+  it('P-08 · plegar conserva el total al céntimo', () => {
+    const filas = agregar(
+      [...Array(30)].map((_, i) => reg({ proyecto: 'p' + i, salida: (30 - i) * 1000 })),
+      'proyecto',
+    );
+    const total = filas.reduce((s, f) => s + f.usd, 0);
+    const { filas: visibles, otros } = plegar(filas, 1, 8);
+    const plegado = visibles.reduce((s, f) => s + f.usd, 0) + (otros?.usd ?? 0);
+    assert.ok(Math.abs(total - plegado) < 1e-12, 'no puede perderse ni un céntimo');
+    assert.ok(visibles.length <= 8);
+    assert.equal(otros!.mensajes + visibles.reduce((s, f) => s + f.mensajes, 0), 30);
+  });
+
+  it('P-09 · una tarifa escrita a mano se limpia antes de usarse', () => {
+    const t = tarifasValidas({
+      bueno: { entrada: 2, salida: 10 },
+      texto: { entrada: 'dos', salida: 'diez' },
+      negativo: { entrada: -1, salida: -5 },
+      medio: { entrada: 3 },
+      nulo: null,
+    });
+    assert.deepEqual(t.bueno, { entrada: 2, salida: 10 });
+    assert.equal(t.texto, undefined, 'un texto no es una tarifa');
+    assert.equal(t.negativo, undefined);
+    assert.deepEqual(t.medio, { entrada: 3, salida: 0 }, 'media tarifa vale: la otra mitad es cero');
+    assert.equal(t.nulo, undefined);
+    assert.deepEqual(tarifasValidas(undefined), {});
+    assert.deepEqual(tarifasValidas('no soy un objeto'), {});
+  });
+
+  it('P-08 · sin cola no aparece la fila otros', () => {
+    const filas = agregar([reg({ proyecto: 'a', salida: 1e6 })], 'proyecto');
+    assert.equal(plegar(filas, 1, 8).otros, undefined);
   });
 });

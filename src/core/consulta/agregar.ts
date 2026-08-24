@@ -13,16 +13,30 @@ export const SIN = {
   fecha: '(sin-fecha)',
   modelo: '(sin-modelo)',
   sesion: '(sin-sesion)',
+  otros: '(otros)',
 } as const;
+
+/**
+ * Claude Code escribe `HEAD` cuando no consigue resolver una rama —lo hace
+ * incluso en repos que están en `main`, cuando la sesión no arrancó dentro del
+ * repositorio—. No es una rama: es la falta de dato, y agruparlo con las de
+ * verdad sería inventarse el reparto.
+ */
+export const RAMA_SIN_RESOLVER = 'HEAD';
 
 export interface Filtro {
   /** AAAA-MM-DD inclusive. */
   desde?: string;
   hasta?: string;
   proyecto?: string;
+  modelo?: string;
+  cliente?: string;
+  sesion?: string;
   proveedor?: Proveedor;
   /** false excluye los mensajes de subagentes. */
   incluirSubagentes?: boolean;
+  /** Patrones de proyecto a dejar fuera de la vista (nunca del índice). */
+  excluir?: readonly string[];
 }
 
 export interface Fila {
@@ -56,15 +70,32 @@ export interface Opciones {
   clientes?: Record<string, string>;
 }
 
-export function pasaFiltro(r: Registro, f: Filtro): boolean {
+export function pasaFiltro(r: Registro, f: Filtro, clientes?: Record<string, string>): boolean {
   const dia = r.ts.slice(0, 10);
   if (f.desde && (!dia || dia < f.desde)) return false;
   if (f.hasta && (!dia || dia > f.hasta)) return false;
   if (f.proyecto && r.proyecto !== f.proyecto) return false;
+  if (f.modelo && (r.modelo || SIN.modelo) !== f.modelo) return false;
+  if (f.sesion && r.sesion !== f.sesion) return false;
+  if (f.cliente && (clientes?.[r.proyecto] ?? SIN.cliente) !== f.cliente) return false;
   if (f.proveedor && r.proveedor !== f.proveedor) return false;
   if (f.incluirSubagentes === false && r.subagente) return false;
+  if (f.excluir?.length && f.excluir.some((patron) => casaPatron(r.proyecto, patron))) return false;
   return true;
 }
+
+/** Patrón sencillo con `*`: lo que la gente espera escribir en un ajuste. */
+export function casaPatron(valor: string, patron: string): boolean {
+  const p = patron.trim().toLowerCase();
+  if (!p) return false;
+  const v = valor.toLowerCase();
+  if (!p.includes('*')) return v.includes(p);
+  const re = new RegExp('^' + p.split('*').map(escaparRegex).join('.*') + '$');
+  return re.test(v);
+}
+
+const ESPECIALES = new Set(['.', '+', '?', '^', '$', '{', '}', '(', ')', '|', '[', ']', '\\']);
+const escaparRegex = (s: string): string => [...s].map((c) => (ESPECIALES.has(c) ? '\\' + c : c)).join('');
 
 export function claveDe(r: Registro, eje: Eje, clientes?: Record<string, string>): string {
   switch (eje) {
@@ -75,7 +106,7 @@ export function claveDe(r: Registro, eje: Eje, clientes?: Record<string, string>
     case 'modelo':
       return r.modelo || SIN.modelo;
     case 'rama':
-      return r.rama || SIN.rama;
+      return !r.rama || r.rama === RAMA_SIN_RESOLVER ? SIN.rama : r.rama;
     case 'proveedor':
       return r.proveedor;
     case 'cliente':
@@ -88,7 +119,7 @@ export function claveDe(r: Registro, eje: Eje, clientes?: Record<string, string>
 export function agregar(registros: Iterable<Registro>, eje: Eje, filtro: Filtro = {}, opciones: Opciones = {}): Fila[] {
   const mapa = new Map<string, Fila>();
   for (const r of registros) {
-    if (!pasaFiltro(r, filtro)) continue;
+    if (!pasaFiltro(r, filtro, opciones.clientes)) continue;
     const clave = claveDe(r, eje, opciones.clientes);
     let fila = mapa.get(clave);
     if (!fila) {
@@ -110,7 +141,7 @@ export function agregar(registros: Iterable<Registro>, eje: Eje, filtro: Filtro 
 export function resumir(registros: Iterable<Registro>, filtro: Filtro = {}, opciones: Opciones = {}): Resumen {
   const r: Resumen = { usd: 0, tokens: 0, mensajes: 0, sinTarifa: 0, derivados: 0, usdSinDesgloseCache: 0, desde: '', hasta: '' };
   for (const reg of registros) {
-    if (!pasaFiltro(reg, filtro)) continue;
+    if (!pasaFiltro(reg, filtro, opciones.clientes)) continue;
     const c = costeDe(reg, opciones.tarifasExtra);
     if (c.usd === null) r.sinTarifa++;
     else r.usd += c.usd;
@@ -157,4 +188,98 @@ export function fechaLocal(d: Date): string {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+/** Una fila que además sabe de dónde salió, para poder enseñar algo legible. */
+export interface FilaConMuestra extends Fila {
+  proyecto: string;
+  desdeDia: string;
+  hastaDia: string;
+}
+
+/**
+ * Sesiones ordenadas por coste. Un identificador de sesión no le dice nada a
+ * nadie, así que cada fila lleva su proyecto y sus fechas.
+ */
+export function sesiones(registros: Iterable<Registro>, filtro: Filtro = {}, opciones: Opciones = {}): FilaConMuestra[] {
+  const mapa = new Map<string, FilaConMuestra>();
+  for (const r of registros) {
+    if (!pasaFiltro(r, filtro, opciones.clientes)) continue;
+    const clave = r.sesion || SIN.sesion;
+    let fila = mapa.get(clave);
+    if (!fila) {
+      fila = {
+        clave, usd: 0, tokens: 0, mensajes: 0, sinTarifa: 0, derivados: 0,
+        cacheEscritura1h: 0, cacheEscritura5m: 0,
+        proyecto: r.proyecto, desdeDia: '', hastaDia: '',
+      };
+      mapa.set(clave, fila);
+    }
+    const c = costeDe(r, opciones.tarifasExtra);
+    if (c.usd === null) fila.sinTarifa++;
+    else fila.usd += c.usd;
+    if (c.confianza === 'derivado') fila.derivados++;
+    fila.tokens += tokensDe(r);
+    fila.mensajes++;
+    const dia = r.ts.slice(0, 10);
+    if (dia) {
+      if (!fila.desdeDia || dia < fila.desdeDia) fila.desdeDia = dia;
+      if (!fila.hastaDia || dia > fila.hastaDia) fila.hastaDia = dia;
+    }
+  }
+  return [...mapa.values()].sort((a, b) => b.usd - a.usd || b.mensajes - a.mensajes);
+}
+
+/**
+ * Pliega la cola en una fila «otros». Nunca esconde dinero: lo suma y lo
+ * enseña. Se usa solo para mirar; la exportación no pliega jamás.
+ */
+export function plegar(filas: Fila[], umbralPorCiento: number, tope: number): { filas: Fila[]; otros?: Fila } {
+  if (umbralPorCiento <= 0 && filas.length <= tope) return { filas };
+  const total = filas.reduce((s, f) => s + f.usd, 0);
+  const minimo = (total * umbralPorCiento) / 100;
+  const visibles: Fila[] = [];
+  const resto: Fila[] = [];
+  for (const f of filas) {
+    if (visibles.length < tope && f.usd >= minimo) visibles.push(f);
+    else resto.push(f);
+  }
+  if (!resto.length) return { filas: visibles };
+  const otros: Fila = {
+    clave: SIN.otros,
+    usd: resto.reduce((s, f) => s + f.usd, 0),
+    tokens: resto.reduce((s, f) => s + f.tokens, 0),
+    mensajes: resto.reduce((s, f) => s + f.mensajes, 0),
+    sinTarifa: resto.reduce((s, f) => s + f.sinTarifa, 0),
+    derivados: resto.reduce((s, f) => s + f.derivados, 0),
+    cacheEscritura1h: resto.reduce((s, f) => s + f.cacheEscritura1h, 0),
+    cacheEscritura5m: resto.reduce((s, f) => s + f.cacheEscritura5m, 0),
+  };
+  return { filas: visibles, otros };
+}
+
+/**
+ * El periodo inmediatamente anterior, de la misma duración y sin solaparse.
+ * Sin rango cerrado no hay comparación posible: devuelve undefined en vez de
+ * inventarse una ventana.
+ */
+export function periodoAnterior(f: Filtro): Filtro | undefined {
+  if (!f.desde || !f.hasta) return undefined;
+  const desde = Date.parse(f.desde + 'T00:00:00Z');
+  const hasta = Date.parse(f.hasta + 'T00:00:00Z');
+  if (!Number.isFinite(desde) || !Number.isFinite(hasta) || hasta < desde) return undefined;
+  const dias = Math.round((hasta - desde) / 86400_000) + 1;
+  const finPrevio = new Date(desde - 86400_000);
+  const iniPrevio = new Date(desde - dias * 86400_000);
+  return { ...f, desde: iniPrevio.toISOString().slice(0, 10), hasta: finPrevio.toISOString().slice(0, 10) };
+}
+
+/** Mensajes que no traen rama utilizable, para poder decirlo en vez de callarlo. */
+export function sinRama(registros: Iterable<Registro>, filtro: Filtro = {}, opciones: Opciones = {}): number {
+  let n = 0;
+  for (const r of registros) {
+    if (!pasaFiltro(r, filtro, opciones.clientes)) continue;
+    if (!r.rama || r.rama === RAMA_SIN_RESOLVER) n++;
+  }
+  return n;
 }

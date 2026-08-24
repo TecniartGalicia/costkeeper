@@ -12,5 +12,7 @@
   "cfg.cambioEurUsd": "EUR per USD, used only when the currency is EUR. `0` keeps amounts in USD.",
   "cfg.tarifasExtra": "Your own rates per model, in USD per million tokens: `{\"gpt-5.6-sol\": {\"entrada\": 1.25, \"salida\": 10}}`. Needed for Codex, which has no rate shipped with the extension.",
   "cfg.barraDeEstado": "Show the current session in the status bar.",
-  "cfg.indexarAlAbrir": "Refresh the index when the panel opens."
+  "cfg.indexarAlAbrir": "Refresh the index when the panel opens.",
+  "cfg.excluirProyectos": "Project paths to leave out of the panel. Plain text matches anywhere; `*` is a wildcard. The index keeps everything: removing a pattern brings the data back.",
+  "cmd.tarifa": "Set the rate for a model"
 }

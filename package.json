@@ -2,7 +2,7 @@
   "name": "costkeeper",
   "displayName": "CostKeeper",
   "description": "What did your coding agents actually cost, per project and per client. Reads the Claude Code and Codex history already on your disk. Local, no account, no telemetry. Not affiliated with Anthropic or OpenAI.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "argalla",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -128,6 +128,11 @@
         "command": "costkeeper.reconstruir",
         "title": "%cmd.reconstruir%",
         "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.tarifa",
+        "title": "%cmd.tarifa%",
+        "category": "CostKeeper"
       }
     ],
     "configuration": {
@@ -171,6 +176,15 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "%cfg.indexarAlAbrir%"
+        },
+        "costkeeper.excluirProyectos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "machine",
+          "markdownDescription": "%cfg.excluirProyectos%"
         }
       }
     },
