@@ -84,18 +84,48 @@ export function pasaFiltro(r: Registro, f: Filtro, clientes?: Record<string, str
   return true;
 }
 
-/** Patrón sencillo con `*`: lo que la gente espera escribir en un ajuste. */
+/**
+ * Patrón de exclusión sobre una ruta de proyecto.
+ *
+ * Sin comodines casa la ruta exacta o cualquiera **dentro** de ella: excluir
+ * `c:/users/x` no puede llevarse medio panel por coincidir a mitad de otra ruta,
+ * que es lo que hacía la comparación por subcadena.
+ *
+ * Con `*` casa por comodines, y el emparejamiento es lineal a propósito: una
+ * expresión regular con muchos `*` tarda decenas de segundos y congela la
+ * interfaz (medido: 60 comodines, 56 s).
+ */
 export function casaPatron(valor: string, patron: string): boolean {
   const p = patron.trim().toLowerCase();
   if (!p) return false;
   const v = valor.toLowerCase();
-  if (!p.includes('*')) return v.includes(p);
-  const re = new RegExp('^' + p.split('*').map(escaparRegex).join('.*') + '$');
-  return re.test(v);
+  if (!p.includes('*')) return v === p || v.startsWith(p.replace(/\/+$/, '') + '/');
+  return casaComodines(v, p);
 }
 
-const ESPECIALES = new Set(['.', '+', '?', '^', '$', '{', '}', '(', ')', '|', '[', ']', '\\']);
-const escaparRegex = (s: string): string => [...s].map((c) => (ESPECIALES.has(c) ? '\\' + c : c)).join('');
+/** Emparejamiento con `*` en tiempo lineal: sin retroceso, sin regex. */
+function casaComodines(texto: string, patron: string): boolean {
+  let t = 0;
+  let p = 0;
+  let ultimoAsterisco = -1;
+  let vueltaT = 0;
+  while (t < texto.length) {
+    if (p < patron.length && (patron[p] === texto[t])) {
+      t++;
+      p++;
+    } else if (p < patron.length && patron[p] === '*') {
+      ultimoAsterisco = p++;
+      vueltaT = t;
+    } else if (ultimoAsterisco !== -1) {
+      p = ultimoAsterisco + 1;
+      t = ++vueltaT;
+    } else {
+      return false;
+    }
+  }
+  while (p < patron.length && patron[p] === '*') p++;
+  return p === patron.length;
+}
 
 export function claveDe(r: Registro, eje: Eje, clientes?: Record<string, string>): string {
   switch (eje) {

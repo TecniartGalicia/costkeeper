@@ -267,14 +267,26 @@ describe('0.2.0 · mejoras del panel', () => {
     assert.equal(resumir(datos, { cliente: SIN.cliente }, opciones).usd, 5);
   });
 
-  it('P-03 · los patrones de exclusión no se pasan de listos', () => {
-    assert.equal(casaPatron('c:/x/uno', 'uno'), true);
+  it('P-03 · un patrón sin comodines es una ruta, no una subcadena', () => {
+    // Auditoría A-1: con comparación por subcadena, excluir la carpeta de
+    // trabajo se llevaba el panel entero, porque todo cuelga de ella.
+    assert.equal(casaPatron('c:/x/uno', 'c:/x/uno'), true, 'la ruta exacta');
+    assert.equal(casaPatron('c:/x/uno/dentro', 'c:/x/uno'), true, 'y lo que hay dentro');
+    assert.equal(casaPatron('c:/x/uno', 'uno'), false, 'un trozo suelto ya no basta');
+    assert.equal(casaPatron('c:/x/unos-mas', 'c:/x/uno'), false, 'ni un prefijo a medias');
     assert.equal(casaPatron('c:/x/uno', 'c:/x/*'), true);
-    assert.equal(casaPatron('c:/x/uno', 'c:/y/*'), false);
-    assert.equal(casaPatron('c:/x/uno', 'un'), true, 'el texto suelto casa en cualquier parte');
+    assert.equal(casaPatron('c:/x/uno', '*uno'), true);
     assert.equal(casaPatron('c:/x/uno', '*/dos'), false);
     assert.equal(casaPatron('c:/x/uno', ''), false);
     assert.equal(resumir(datos, { excluir: ['c:/x/uno'] }).usd, 5);
+    assert.equal(resumir(datos, { excluir: ['c:/x'] }).usd, 0, 'excluir el padre se lleva a los hijos');
+  });
+
+  it('P-03 · un patrón con muchos comodines no cuelga la interfaz', () => {
+    // Auditoría A-4: la versión con expresión regular tardaba 56 segundos.
+    const t = Date.now();
+    assert.equal(casaPatron('c:/users/x/proyecto/muy/hondo/y/largo/de/verdad', '*'.repeat(60) + 'nada'), false);
+    assert.ok(Date.now() - t < 500, `tardó ${Date.now() - t} ms`);
   });
 
   it('P-04 · el periodo anterior no se solapa ni deja hueco', () => {

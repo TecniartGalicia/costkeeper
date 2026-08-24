@@ -27,6 +27,9 @@ jobs:
       - run: npm run check
       - run: node scripts/l10n-sync.mjs
       - run: npm run build
+      - name: Webview audit (focus, click-to-filter, remove-filter)
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium && npm run audit:panel
       - name: Integration tests (Linux needs a display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:integration

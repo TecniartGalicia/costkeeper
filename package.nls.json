@@ -13,6 +13,6 @@
   "cfg.tarifasExtra": "Your own rates per model, in USD per million tokens: `{\"gpt-5.6-sol\": {\"entrada\": 1.25, \"salida\": 10}}`. Needed for Codex, which has no rate shipped with the extension.",
   "cfg.barraDeEstado": "Show the current session in the status bar.",
   "cfg.indexarAlAbrir": "Refresh the index when the panel opens.",
-  "cfg.excluirProyectos": "Project paths to leave out of the panel. Plain text matches anywhere; `*` is a wildcard. The index keeps everything: removing a pattern brings the data back.",
+  "cfg.excluirProyectos": "Project paths to leave out of the panel. A path with no `*` means that folder and everything inside it; `*` is a wildcard. The index keeps everything: removing a pattern brings the data back.",
   "cmd.tarifa": "Set the rate for a model"
 }

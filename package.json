@@ -2,7 +2,7 @@
   "name": "costkeeper",
   "displayName": "CostKeeper",
   "description": "What did your coding agents actually cost, per project and per client. Reads the Claude Code and Codex history already on your disk. Local, no account, no telemetry. Not affiliated with Anthropic or OpenAI.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "argalla",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -70,7 +70,8 @@
     "test": "npm run compile-tests && mocha \"out/test/unit/**/*.test.js\"",
     "test:integration": "npm run build && npm run compile-tests && node ./out/test/integration/runTest.js",
     "package": "vsce package --no-dependencies",
-    "check": "npm run typecheck && npm run lint && npm run l10n && npm test"
+    "check": "npm run typecheck && npm run lint && npm run l10n && npm test",
+    "audit:panel": "node scripts/auditar-panel.mjs"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
@@ -85,6 +86,7 @@
     "glob": "^13.0.6",
     "mocha": "^11.1.0",
     "ovsx": "^1.1.1",
+    "playwright": "^1.62.1",
     "typescript": "^5.8.0"
   },
   "contributes": {

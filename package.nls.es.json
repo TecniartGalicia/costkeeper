@@ -13,6 +13,6 @@
   "cfg.tarifasExtra": "Tus propias tarifas por modelo, en dólares por millón de tokens: `{\"gpt-5.6-sol\": {\"entrada\": 1.25, \"salida\": 10}}`. Hacen falta para Codex, que no trae tarifa incluida.",
   "cfg.barraDeEstado": "Mostrar la sesión en curso en la barra de estado.",
   "cfg.indexarAlAbrir": "Actualizar el índice al abrir el panel.",
-  "cfg.excluirProyectos": "Rutas de proyecto que no quieres ver en el panel. El texto suelto casa en cualquier parte; `*` es comodín. El índice lo conserva todo: al quitar el patrón vuelven los datos.",
+  "cfg.excluirProyectos": "Rutas de proyecto que no quieres ver en el panel. Una ruta sin `*` significa esa carpeta y todo lo que hay dentro; `*` es comodín. El índice lo conserva todo: al quitar el patrón vuelven los datos.",
   "cmd.tarifa": "Poner la tarifa de un modelo"
 }

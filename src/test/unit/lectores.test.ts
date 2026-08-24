@@ -151,6 +151,17 @@ describe('lector de Claude Code', () => {
     assert.equal(r.registros[0].ts, '');
   });
 
+  it('descarta contadores absurdos que romperían el total', async () => {
+    // Auditoría A-5: 1e308 es finito, y al aplicarle la tarifa daba Infinity,
+    // que se propagaba al total del panel entero.
+    const linea = JSON.stringify({ type: 'assistant', cwd: '/p', timestamp: '2026-08-24T10:00:00Z',
+      message: { id: 'abs', model: 'claude-opus-5', usage: { input_tokens: 1e308, output_tokens: 5 } } });
+    const p = escribir('abs.jsonl', linea + BR);
+    const r = await leerFichero(p, undefined, stat(p));
+    assert.equal(r.registros[0].entrada, 0, 'el contador absurdo se descarta');
+    assert.equal(r.registros[0].salida, 5, 'el bueno se conserva');
+  });
+
   it('descarta valores negativos o no numéricos', async () => {
     const linea = JSON.stringify({ type: 'assistant', message: { id: 'y', model: 'claude-opus-5', usage: { input_tokens: -5, output_tokens: 'muchos', cache_read_input_tokens: null } } });
     const p = escribir('l.jsonl', linea + '\n');

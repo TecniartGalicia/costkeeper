@@ -153,6 +153,13 @@ async function leerMeta(ruta: string): Promise<{ sesion: string; cwd: string; ts
   return porDefecto;
 }
 
+/**
+ * Un contador de tokens tiene un techo razonable. Sin él, un valor absurdo en
+ * un transcript corrupto (medido con 1e308) convierte el total del panel entero
+ * en Infinity: se pierde la cifra buena por un dato malo.
+ */
+const TOPE_TOKENS = 1e12;
+
 function num(v: unknown): number {
-  return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : 0;
+  return typeof v === 'number' && Number.isFinite(v) && v > 0 && v <= TOPE_TOKENS ? v : 0;
 }

@@ -5,6 +5,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-24
+
+A full audit of 0.2.0 — invariants over a real 91,000-message index, the webview driven in a browser, hostile inputs, and a privacy sweep with canary strings. Five findings, all fixed. The privacy sweep found nothing: 13 checks, no canary anywhere in the index, on disk or in any export.
+
+### Fixed
+
+- **Removing a filter did nothing in English.** The chip sent the *translated* axis name back to the extension, which only understands its internal keys. It worked in Spanish by coincidence.
+- **The search box lost focus on every keystroke**, so nothing past the first letter reached it. The input is now preserved across repaints instead of being rebuilt.
+- **An exclusion pattern without wildcards matched anywhere in the path**, so excluding your home folder emptied the whole panel. A pattern with no `*` now means that path or anything inside it; use `*` for the rest.
+- **A pattern with many wildcards froze the interface** — 60 of them took 56 seconds through a regular expression. Matching is now linear, with no backtracking.
+- **An absurd token count in a transcript turned the whole total into `Infinity`** (measured with 1e308). Counters above a sane ceiling are discarded like any other bad value.
+
+### Added
+
+- `npm run audit:panel` drives the real webview in a browser and checks focus, click-to-filter and filter removal. It runs in CI.
+
 ## [0.2.0] - 2026-08-24
 
 The 0.1.x proved the numbers were right. This one is about being able to look at them: on a real history of 288 projects, the panel showed eight and let you click none.
@@ -46,7 +62,8 @@ First public preview.
 - Client tags, CSV export with a monthly summary, monthly budgets with notices at 50/80/100 %, quota forecast, unlimited history and per-branch reports. All free in this release; the licensing code ships behind a switch that is off.
 - English and Spanish.
 
-[Unreleased]: https://github.com/TecniartGalicia/costkeeper/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/TecniartGalicia/costkeeper/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/TecniartGalicia/costkeeper/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/TecniartGalicia/costkeeper/releases/tag/v0.1.0

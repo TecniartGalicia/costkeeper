@@ -102,25 +102,41 @@ let datos = null;
 const entero = (n) => n.toLocaleString(undefined);
 
 function pintarTabla(destino, tarjeta) {
-  destino.innerHTML = '';
-  if (tarjeta.busqueda !== undefined) {
-    const caja = document.createElement('input');
+  // El buscador NO se recrea al repintar: si se destruye, se pierde el foco y a
+  // partir de la segunda tecla el texto ya no llega a ninguna parte.
+  let caja = destino.querySelector('input.busca');
+  if (tarjeta.busqueda === undefined) {
+    if (caja) { caja.remove(); caja = null; }
+  } else if (!caja) {
+    caja = document.createElement('input');
     caja.className = 'busca';
     caja.type = 'search';
     caja.placeholder = datos.textos.buscar;
     caja.value = tarjeta.busqueda;
     caja.addEventListener('input', () => vscodeApi.postMessage({ tipo: 'buscar', eje: tarjeta.eje, texto: caja.value }));
-    destino.appendChild(caja);
+    destino.insertBefore(caja, destino.firstChild);
+  } else if (document.activeElement !== caja) {
+    // Mientras se escribe manda lo que hay en pantalla, no lo que llega tarde.
+    caja.value = tarjeta.busqueda;
   }
+
+  let cuerpo = destino.querySelector('.cuerpo');
+  if (!cuerpo) {
+    cuerpo = document.createElement('div');
+    cuerpo.className = 'cuerpo';
+    destino.appendChild(cuerpo);
+  }
+  cuerpo.innerHTML = '';
+
   if (!tarjeta.filas.length) {
     const p = document.createElement('p');
     p.className = 'vacio';
     p.textContent = datos.textos.sinDatos;
-    destino.appendChild(p);
+    cuerpo.appendChild(p);
     return;
   }
-  const caja = document.createElement('div');
-  if (tarjeta.todas) caja.className = 'desplaza';
+  const marco = document.createElement('div');
+  if (tarjeta.todas) marco.className = 'desplaza';
   const t = document.createElement('table');
   for (const f of tarjeta.filas) {
     const tr = document.createElement('tr');
@@ -146,15 +162,15 @@ function pintarTabla(destino, tarjeta) {
     }
     t.appendChild(tr);
   }
-  caja.appendChild(t);
-  destino.appendChild(caja);
+  marco.appendChild(t);
+  cuerpo.appendChild(marco);
 
   if (tarjeta.ocultas > 0 || tarjeta.todas) {
     const b = document.createElement('button');
     b.className = 'enlace';
     b.textContent = tarjeta.todas ? datos.textos.verMenos : datos.textos.verTodas.replace('{0}', entero(tarjeta.ocultas));
     b.addEventListener('click', () => vscodeApi.postMessage({ tipo: 'verTodas', eje: tarjeta.eje, valor: !tarjeta.todas }));
-    destino.appendChild(b);
+    cuerpo.appendChild(b);
   }
 }
 
@@ -182,7 +198,7 @@ function pintar() {
     chip.className = 'chip';
     const et = document.createElement('span');
     et.innerHTML = '<b></b> ';
-    et.querySelector('b').textContent = f.eje + ':';
+    et.querySelector('b').textContent = f.nombre + ':';
     const val = document.createElement('span');
     val.textContent = ' ' + f.etiqueta;
     val.title = f.valor;
@@ -448,8 +464,11 @@ export class Panel {
       datos: {
         dias: this.estadoPanel.dias,
         incluirSubagentes: this.estadoPanel.incluirSubagentes,
+        // El eje viaja con su clave interna: el webview la devuelve tal cual al
+        // quitar el filtro, y el nombre traducido es solo para leerlo.
         filtros: Object.entries(this.estadoPanel.filtro).map(([eje, valor]) => ({
-          eje: this.nombreEje(eje as Eje),
+          eje,
+          nombre: this.nombreEje(eje as Eje),
           valor,
           etiqueta: eje === 'proyecto' ? nombreCortoProyecto(valor) : eje === 'sesion' ? valor.slice(0, 8) : traducirClave(valor),
         })),
