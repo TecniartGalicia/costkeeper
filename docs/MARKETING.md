@@ -1,6 +1,13 @@
-# CostKeeper · posicionamiento y borradores de lanzamiento
+# CostKeeper · posicionamiento y lanzamiento
 
-Los publica una persona. Yo redacto.
+## Estado del lanzamiento (24 de agosto de 2026)
+
+| Canal | Estado |
+|---|---|
+| **dev.to** | **Publicado**: [Four ways to overcount what your coding agent costs](https://dev.to/nestor_quiroga_d0a1aef9d7/four-ways-to-overcount-what-your-coding-agent-costs-2acl) · cuenta `nestor_quiroga_d0a1aef9d7` · 1.232 palabras, 5 min de lectura · fuente en `docs/articulo-devto.md`, publicado por la API oficial |
+| **X** | **Pendiente**: no hay sesión iniciada en el Chrome de trabajo. Hilo listo abajo |
+| r/ClaudeAI | Pendiente. Borrador abajo |
+| Hacker News | Pendiente |
 
 ## Posicionamiento
 
@@ -38,21 +45,44 @@ Todos medidos el 24 de agosto de 2026 sobre un histórico real de 2,52 GB de Cla
 >
 > On my own history: 192,262 lines with a `usage` object, but only 92,666 real messages. Counting lines gives $66,006. Counting messages gives $29,087.
 >
-> If you dedupe by `message.id` you get the right number. I did that, plus pricing 1-hour cache writes at 2x instead of lumping them with 5-minute ones (another 10.3 %), and put it in a free extension: [link]
+> If you dedupe by `message.id` you get the right number. I did that, plus pricing 1-hour cache writes at 2x instead of lumping them with 5-minute ones (another 10.3 %), and put it in a free extension: https://marketplace.visualstudio.com/items?itemName=argalla.costkeeper
+>
+> Longer write-up with all four ways to get this wrong: https://dev.to/nestor_quiroga_d0a1aef9d7/four-ways-to-overcount-what-your-coding-agent-costs-2acl
 >
 > It reads `~/.claude/projects` and `~/.codex/sessions` locally — no account, no telemetry. Happy to be told I'm wrong about the dedupe, that's the part I'd most like a second opinion on.
 
 Ese último párrafo es deliberado: invita a la corrección en vez de vender, que es lo que funciona en ese subreddit.
 
-## X (hilo de 3)
+## X · hilo de 3, listo para pegar
 
-1. Most Claude Code cost trackers overcount by more than 2×. A message is written to the transcript once per content block, and every copy repeats the full usage object. 192,262 lines → 92,666 actual messages on my history.
-2. Counting lines: $66,006. Counting messages: $29,087. Same data. Dedupe by message.id and the number is right. 1-hour cache writes also cost 2× the 5-minute ones — another 10.3 % nobody splits.
-3. Put it in a free VS Code extension: Claude Code + Codex in one table, cost per project, model and day, client tagging and CSV for invoicing. Local only, no account, no network. [link]
+Con la captura del panel (`media/shots/panel.png`) en el primero.
 
-## dev.to / Hacker News
+**1/3**
+> Most Claude Code cost trackers overcount by more than 2×.
+>
+> An assistant message is written to the transcript once per content block, and every copy repeats the full usage object.
+>
+> 192,262 lines with usage → 92,666 actual messages on my own history.
 
-Ángulo largo: **«Reading agent transcripts: four ways to overcount»** — duplicados por bloque, copias entre ficheros, razonamiento contado dos veces, y el acumulado de Codex sumado evento a evento (×60). Es un artículo técnico útil aunque no instales nada, y ese es el que se comparte.
+**2/3**
+> Counting lines: $66,006. Counting messages: $29,087. Same data.
+>
+> Dedupe by message.id and the number is right. And 1-hour cache writes cost 2× the 5-minute ones — another 10.3% nobody splits.
+>
+> Full write-up: https://dev.to/nestor_quiroga_d0a1aef9d7/four-ways-to-overcount-what-your-coding-agent-costs-2acl
+
+**3/3**
+> I put it in a free VS Code extension. Claude Code + Codex in one table, cost per project, model and day, client tagging and CSV for invoicing.
+>
+> Local only, no account, no network.
+>
+> https://marketplace.visualstudio.com/items?itemName=argalla.costkeeper
+
+## dev.to · publicado
+
+[Four ways to overcount what your coding agent costs](https://dev.to/nestor_quiroga_d0a1aef9d7/four-ways-to-overcount-what-your-coding-agent-costs-2acl). Cubre los cuatro errores —duplicados por bloque, copias entre ficheros, razonamiento contado dos veces y el acumulado de Codex sumado evento a evento— más el que hace contar de menos (la caché por TTL), y los dos hallazgos de rendimiento. Cierra reconociendo que la deduplicación es una inferencia y pidiendo que la contrasten con una factura real.
+
+## Hacker News
 
 Show HN: **«CostKeeper – what your coding agents actually cost, per project and per client»**.
 
