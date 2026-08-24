@@ -90,6 +90,11 @@ export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
     await estado.reconstruir();
   });
 
+  // Cargar el índice ya guardado cuesta unas décimas y es lo que hace que la
+  // barra de estado exista desde el primer momento. NO se indexa aquí: leer
+  // gigabytes al arrancar VS Code sería justo lo contrario de lo que se quiere.
+  void estado.asegurarCargado().catch(() => undefined);
+
   log('CostKeeper activado');
 }
 

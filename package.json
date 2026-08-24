@@ -2,7 +2,7 @@
   "name": "costkeeper",
   "displayName": "CostKeeper",
   "description": "What did your coding agents actually cost, per project and per client. Reads the Claude Code and Codex history already on your disk. Local, no account, no telemetry. Not affiliated with Anthropic or OpenAI.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "argalla",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -54,7 +54,9 @@
       "description": "Reads local transcripts; unrelated to the opened workspace."
     }
   },
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "l10n": "./l10n",
   "scripts": {

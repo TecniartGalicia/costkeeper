@@ -38,7 +38,13 @@ export class BarraEstado {
 
     const registros = [...this.estado.registros];
     if (!registros.length) {
-      this.item.hide();
+      // Recién instalada no hay nada indexado. Esconder el elemento dejaría la
+      // extensión invisible: mejor invitar a leer el histórico.
+      this.item.text = '$(pulse) CostKeeper';
+      this.item.tooltip = new vscode.MarkdownString(
+        l10n.t('**CostKeeper** · nothing read yet. Click to read the Claude Code and Codex history already on this computer.'),
+      );
+      this.item.show();
       return;
     }
 
