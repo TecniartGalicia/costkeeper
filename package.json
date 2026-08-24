@@ -1,0 +1,176 @@
+{
+  "name": "costkeeper",
+  "displayName": "CostKeeper",
+  "description": "What did your coding agents actually cost, per project and per client. Reads the Claude Code and Codex history already on your disk. Local, no account, no telemetry. Not affiliated with Anthropic or OpenAI.",
+  "version": "0.1.0",
+  "publisher": "argalla",
+  "license": "MIT",
+  "icon": "media/icon.png",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "AI",
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "claude code",
+    "codex",
+    "token usage",
+    "cost",
+    "spend",
+    "budget",
+    "usage tracker",
+    "quota",
+    "rate limit",
+    "billing"
+  ],
+  "pricing": "Trial",
+  "preview": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TecniartGalicia/costkeeper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TecniartGalicia/costkeeper/issues"
+  },
+  "homepage": "https://github.com/TecniartGalicia/costkeeper#readme",
+  "qna": "https://github.com/TecniartGalicia/costkeeper/discussions",
+  "galleryBanner": {
+    "color": "#0F172A",
+    "theme": "dark"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "Only reads agent transcripts from your user profile. Nothing from the workspace is executed."
+    },
+    "virtualWorkspaces": {
+      "supported": true,
+      "description": "Reads local transcripts; unrelated to the opened workspace."
+    }
+  },
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "l10n": "./l10n",
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.mjs --production",
+    "watch": "node esbuild.mjs --watch",
+    "compile-tests": "tsc -p tsconfig.test.json",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "l10n": "node scripts/l10n-sync.mjs",
+    "test": "npm run compile-tests && mocha \"out/test/unit/**/*.test.js\"",
+    "test:integration": "npm run build && npm run compile-tests && node ./out/test/integration/runTest.js",
+    "package": "vsce package --no-dependencies",
+    "check": "npm run typecheck && npm run lint && npm run l10n && npm test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.17.0",
+    "@types/vscode": "1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.30.0",
+    "@typescript-eslint/parser": "^8.30.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^3.3.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
+    "glob": "^13.0.6",
+    "mocha": "^11.1.0",
+    "ovsx": "^1.1.1",
+    "typescript": "^5.8.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "costkeeper.abrir",
+        "title": "%cmd.abrir%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.indexar",
+        "title": "%cmd.indexar%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.exportar",
+        "title": "%cmd.exportar%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.etiquetarCliente",
+        "title": "%cmd.etiquetar%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.presupuesto",
+        "title": "%cmd.presupuesto%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.introducirLicencia",
+        "title": "%cmd.licencia%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.quitarLicencia",
+        "title": "%cmd.quitarLicencia%",
+        "category": "CostKeeper"
+      },
+      {
+        "command": "costkeeper.reconstruir",
+        "title": "%cmd.reconstruir%",
+        "category": "CostKeeper"
+      }
+    ],
+    "configuration": {
+      "title": "CostKeeper",
+      "properties": {
+        "costkeeper.rutasExtra": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "machine",
+          "markdownDescription": "%cfg.rutasExtra%"
+        },
+        "costkeeper.moneda": {
+          "type": "string",
+          "enum": [
+            "USD",
+            "EUR"
+          ],
+          "default": "USD",
+          "markdownDescription": "%cfg.moneda%"
+        },
+        "costkeeper.cambioEurUsd": {
+          "type": "number",
+          "default": 0,
+          "markdownDescription": "%cfg.cambioEurUsd%"
+        },
+        "costkeeper.tarifasExtra": {
+          "type": "object",
+          "default": {},
+          "scope": "machine",
+          "markdownDescription": "%cfg.tarifasExtra%"
+        },
+        "costkeeper.barraDeEstado": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%cfg.barraDeEstado%"
+        },
+        "costkeeper.indexarAlAbrir": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%cfg.indexarAlAbrir%"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "fecha": "2026-08-24",
+  "origen": "Precios publicos de la API de Anthropic, USD por millon de tokens",
+  "multiplicadoresCache": {
+    "lectura": 0.1,
+    "escritura5m": 1.25,
+    "escritura1h": 2
+  },
+  "modelos": {
+    "claude-fable-5": { "entrada": 10, "salida": 50 },
+    "claude-mythos-5": { "entrada": 10, "salida": 50 },
+    "claude-opus-5": { "entrada": 5, "salida": 25 },
+    "claude-opus-4-8": { "entrada": 5, "salida": 25 },
+    "claude-opus-4-7": { "entrada": 5, "salida": 25 },
+    "claude-opus-4-6": { "entrada": 5, "salida": 25 },
+    "claude-sonnet-5": { "entrada": 3, "salida": 15 },
+    "claude-sonnet-4-6": { "entrada": 3, "salida": 15 },
+    "claude-haiku-4-5": { "entrada": 1, "salida": 5 }
+  }
+}

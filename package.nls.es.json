@@ -1,0 +1,16 @@
+{
+  "cmd.abrir": "Abrir el panel",
+  "cmd.indexar": "Actualizar el índice",
+  "cmd.exportar": "Exportar a CSV",
+  "cmd.etiquetar": "Etiquetar un proyecto con un cliente",
+  "cmd.presupuesto": "Poner un presupuesto mensual",
+  "cmd.licencia": "Introducir la clave de licencia Pro",
+  "cmd.quitarLicencia": "Quitar la licencia Pro de este equipo",
+  "cmd.reconstruir": "Reconstruir el índice desde cero",
+  "cfg.rutasExtra": "Carpetas adicionales con transcripciones de Claude Code (`.jsonl`). Las ubicaciones habituales se leen siempre.",
+  "cfg.moneda": "Moneda en la que se muestra el coste equivalente de API.",
+  "cfg.cambioEurUsd": "Euros por dólar, solo si la moneda es EUR. Con `0` los importes se quedan en dólares.",
+  "cfg.tarifasExtra": "Tus propias tarifas por modelo, en dólares por millón de tokens: `{\"gpt-5.6-sol\": {\"entrada\": 1.25, \"salida\": 10}}`. Hacen falta para Codex, que no trae tarifa incluida.",
+  "cfg.barraDeEstado": "Mostrar la sesión en curso en la barra de estado.",
+  "cfg.indexarAlAbrir": "Actualizar el índice al abrir el panel."
+}
