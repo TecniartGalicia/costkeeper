@@ -50,7 +50,7 @@ describe('deduplicación', () => {
     const base: Registro = {
       id: 'z', proveedor: 'claude', ts: '', proyecto: 'p', rama: '', sesion: '', subagente: false,
       modelo: 'claude-opus-5', entrada: 10, salida: 100, cacheLectura: 0, cacheEscritura5m: 0, cacheEscritura1h: 0,
-      razonamiento: 0, fuente: 'f',
+      razonamiento: 0, fuentes: ['f'],
     };
     fundir(ind, base);
     fundir(ind, { ...base, entrada: 900 });
@@ -94,6 +94,20 @@ describe('indexado incremental', () => {
     fs.writeFileSync(p, mensajeClaude({ id: 'z9' }) + '\n');
     await indexar(ind, { home });
     assert.deepEqual([...ind.registros.keys()], ['z9']);
+  });
+
+  it('un mensaje que vive en dos ficheros sobrevive a que se borre uno', async () => {
+    const a = transcript('dos-a.jsonl', [mensajeClaude({ id: 'compartido', salida: 400 })]);
+    transcript('dos-b.jsonl', [mensajeClaude({ id: 'compartido', salida: 400 })]);
+    const ind = indiceVacio();
+    await indexar(ind, { home });
+    assert.equal(ind.registros.size, 1);
+    assert.equal(ind.registros.get('compartido')!.fuentes.length, 2);
+
+    fs.rmSync(a);
+    await indexar(ind, { home });
+    assert.equal(ind.registros.size, 1, 'el cobro sigue vivo en el otro fichero');
+    assert.deepEqual(ind.registros.get('compartido')!.fuentes.length, 1);
   });
 
   it('un fichero borrado deja de contar', async () => {

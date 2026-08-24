@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { decideAfterValidation, decideOffline, GRACE_DAYS, looksLikeLicenseKey, REVALIDATE_HOURS, type LicenseState } from '../../core/license';
 import { DIAS_GRATIS, recorteGratis } from '../../core/plan';
+import { PRO_ACTIVO } from '../../pro/polarConfig';
 
 const H = 3600_000;
 const D = 86400_000;
@@ -25,7 +26,20 @@ describe('plan gratuito', () => {
   });
 });
 
-describe('licencia', () => {
+describe('extensión gratuita', () => {
+  it('con Pro apagado no se cobra nada ni se pide licencia', () => {
+    assert.equal(PRO_ACTIVO, false, 'esta versión se publica gratis');
+  });
+
+  it('con Pro apagado el histórico no se recorta', () => {
+    // recorteGratis solo recorta cuando la decisión dice que no hay Pro, y con
+    // PRO_ACTIVO en false proStatus siempre responde que sí.
+    const f = recorteGratis({ desde: '2020-01-01' }, true, AHORA);
+    assert.equal(f.desde, '2020-01-01');
+  });
+});
+
+describe('licencia (dormida hasta que se active Pro)', () => {
   it('sin clave no hay Pro y no se toca la red', () => {
     assert.deepEqual(decideOffline({}, AHORA), { pro: false, reason: 'no-key' });
   });

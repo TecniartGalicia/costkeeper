@@ -72,7 +72,7 @@ export async function leerFichero(
       cacheEscritura5m: tiene5m ? num(cc.ephemeral_5m_input_tokens) : tiene1h ? 0 : agregado,
       cacheEscritura1h: tiene1h ? num(cc.ephemeral_1h_input_tokens) : 0,
       razonamiento: num(u.output_tokens_details?.thinking_tokens),
-      fuente: ruta,
+      fuentes: [ruta],
       ...(!tiene5m && !tiene1h && agregado > 0 ? { cacheDerivada: true } : {}),
     });
   }

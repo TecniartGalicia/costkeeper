@@ -17,7 +17,7 @@ First public preview.
 - Cache writes priced by TTL — 1 hour at 2×, 5 minutes at 1.25× — which changes the total by 10.3 %.
 - Codex quota as published by Codex (percentage, window, reset, plan) and Claude's 5-hour window derived from timestamps, labelled as derived and shown without a percentage.
 - Status bar with today's spend for the open project.
-- Pro (9 €, one-time, licences by Polar): client tags, CSV export with a monthly summary, monthly budgets with notices at 50/80/100 %, quota forecast, unlimited history and per-branch reports.
+- Client tags, CSV export with a monthly summary, monthly budgets with notices at 50/80/100 %, quota forecast, unlimited history and per-branch reports. All free in this release; the licensing code ships behind a switch that is off.
 - English and Spanish.
 
 [Unreleased]: https://github.com/TecniartGalicia/costkeeper/compare/v0.1.0...HEAD

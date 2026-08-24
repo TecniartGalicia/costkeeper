@@ -34,24 +34,16 @@ Two more things nobody else does:
 
 ## What you get
 
-**Free, forever**
+Everything below is **free**. There is no paid tier today.
 
 - Claude Code and Codex in the same table, indexed incrementally. 4 GB of history in about 7 seconds; after that, updates are instant.
 - Cost by project, model, day, branch and session — subagents counted separately.
+- **Tag a project with a client**, then group and export by client. The CSV is meant to go straight into an invoice.
+- Monthly budgets per project, with a notice at 50, 80 and 100 %.
 - **Codex quota as published by Codex itself**: percentage used, window, reset time, plan.
 - Claude's 5-hour window reconstructed from timestamps — labelled as derived, and deliberately without a percentage, because that number cannot be known.
 - Status bar with today's spend for the open project.
-- The last 30 days.
-
-**Pro — 9 €, one-time**
-
-- **Tag a project with a client**, then group and export by client. The report is meant to go straight into an invoice.
-- CSV export with a monthly summary.
-- Monthly budgets per project with a notice at 50, 80 and 100 %.
-- Quota forecast: at this rate, when you run out.
-- Unlimited history and per-branch reports.
-
-Removing Pro never takes anything away from the free version, and the data is never deleted — a licence just shows all of it again.
+- Unlimited history.
 
 ## Two numbers, never mixed
 
@@ -63,7 +55,7 @@ Rates ship in a dated file (`src/core/precios/tarifas.json`) and the date is sho
 
 ## Privacy
 
-The index holds no free text at all: no prompts, no code, no edited file names. The most sensitive things it stores are the project path and the branch name. Nothing leaves your machine except the licence check, and only if you buy Pro. See [PRIVACY.md](PRIVACY.md).
+The index holds no free text at all: no prompts, no code, no edited file names. The most sensitive things it stores are the project path and the branch name. Nothing leaves your machine at all: the extension makes no network request. See [PRIVACY.md](PRIVACY.md).
 
 ## Requirements
 

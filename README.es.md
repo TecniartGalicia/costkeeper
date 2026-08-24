@@ -34,24 +34,16 @@ Dos cosas más que no hace nadie:
 
 ## Qué incluye
 
-**Gratis, para siempre**
+Todo lo de abajo es **gratis**. Hoy no hay versión de pago.
 
 - Claude Code y Codex en la misma tabla, con indexado incremental. 4 GB de histórico en unos 7 segundos; a partir de ahí, las actualizaciones son instantáneas.
 - Gasto por proyecto, modelo, día, rama y sesión, con los subagentes contados aparte.
+- **Etiquetar un proyecto con un cliente**, y agrupar y exportar por cliente. El CSV está pensado para ir directo a una factura.
+- Presupuestos mensuales por proyecto, con aviso al 50, al 80 y al 100 %.
 - **La cuota de Codex tal como la publica Codex**: porcentaje usado, ventana, cuándo se reinicia y plan.
 - La ventana de cinco horas de Claude reconstruida a partir de las marcas de tiempo, etiquetada como deducida y a propósito sin porcentaje, porque ese dato no se puede saber.
 - Barra de estado con el gasto de hoy del proyecto abierto.
-- Los últimos 30 días.
-
-**Pro — 9 €, pago único**
-
-- **Etiquetar un proyecto con un cliente**, y agrupar y exportar por cliente. El informe está pensado para ir directo a una factura.
-- Exportación a CSV con resumen mensual.
-- Presupuestos mensuales por proyecto con aviso al 50, al 80 y al 100 %.
-- Predicción de cuota: a este ritmo, cuándo te quedas sin ella.
-- Histórico ilimitado e informes por rama.
-
-Quitar Pro no le quita nada a la versión gratuita, y los datos no se borran nunca: la licencia solo vuelve a enseñarlos enteros.
+- Histórico ilimitado.
 
 ## Dos cifras que nunca se mezclan
 
@@ -63,7 +55,7 @@ Las tarifas viven en un fichero con fecha (`src/core/precios/tarifas.json`) y es
 
 ## Privacidad
 
-El índice no guarda ni un texto libre: ni prompts, ni código, ni nombres de ficheros editados. Lo más sensible que almacena es la ruta del proyecto y el nombre de la rama. No sale nada de tu equipo salvo la comprobación de licencia, y solo si compras Pro. Ver [PRIVACY.es.md](PRIVACY.es.md).
+El índice no guarda ni un texto libre: ni prompts, ni código, ni nombres de ficheros editados. Lo más sensible que almacena es la ruta del proyecto y el nombre de la rama. No sale absolutamente nada de tu equipo: la extensión no hace ninguna petición de red. Ver [PRIVACY.es.md](PRIVACY.es.md).
 
 ## Requisitos
 

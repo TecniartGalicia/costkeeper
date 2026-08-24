@@ -28,8 +28,12 @@ export interface Registro {
   cacheEscritura1h: number;
   /** Informativo: ya está incluido en `salida`, nunca se suma aparte. */
   razonamiento: number;
-  /** Fichero del que salió, para poder purgarlo si se reescribe. */
-  fuente: string;
+  /**
+   * Ficheros en los que aparece este mensaje. Suele ser uno, pero `--resume`,
+   * los forks y los worktrees copian mensajes: si se purga uno de esos ficheros
+   * el cobro debe seguir contando mientras quede otro vivo.
+   */
+  fuentes: string[];
   /** true cuando el desglose de caché por TTL no venía y se imputó a 5 m. */
   cacheDerivada?: boolean;
 }

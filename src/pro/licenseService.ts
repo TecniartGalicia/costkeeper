@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { l10n } from 'vscode';
 import { decideAfterValidation, decideOffline, FetchLike, LicenseState, looksLikeLicenseKey, polarActivate, polarDeactivate, polarValidate, ProDecision } from '../core/license';
 import { log } from '../vscode/registro';
-import { DEV_UNLOCK_ENV, POLAR_CHECKOUT_URL, POLAR_ORGANIZATION_ID, polarConfigured, PRO_INFO_URL, PRO_PRICE_LABEL } from './polarConfig';
+import { DEV_UNLOCK_ENV, POLAR_CHECKOUT_URL, POLAR_ORGANIZATION_ID, polarConfigured, PRO_ACTIVO, PRO_INFO_URL, PRO_PRICE_LABEL } from './polarConfig';
 
 const SECRET_KEY = 'costkeeper.license';
 /** Cheap flag so free commands never touch secret storage on machines that never had a licence. */
@@ -51,6 +51,8 @@ export function invalidateProCache(): void {
 
 /** Decides Pro status: offline first, network (throttled) only when needed. Never throws. */
 export async function proStatus(context: vscode.ExtensionContext, force = false, token?: vscode.CancellationToken): Promise<ProDecision> {
+  // Mientras la extensión sea gratis no hay nada que validar ni que pedir.
+  if (!PRO_ACTIVO) return { pro: true, source: 'free' };
   if (!force && cached && Date.now() - cached.at < 60_000) return cached.decision;
   // A forced check may sleep through a rate limit; background callers must not queue behind it.
   if (inflight && !force) return inflight;

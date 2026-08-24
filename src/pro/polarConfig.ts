@@ -1,4 +1,12 @@
 /**
+ * CostKeeper es GRATIS por ahora: `PRO_ACTIVO` en false regala todas las
+ * funciones de pago y esconde los comandos de licencia. El código de licencias
+ * se conserva entero; para volver a cobrar basta con poner el interruptor a
+ * true y rellenar la organización y la URL de compra.
+ */
+export const PRO_ACTIVO = false;
+
+/**
  * Configuración de Polar (merchant of record) para CostKeeper Pro.
  *
  * Se rellena cuando existan la organización y el producto en Polar

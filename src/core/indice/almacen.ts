@@ -8,7 +8,7 @@ const gzip = promisify(zlib.gzip);
 const gunzip = promisify(zlib.gunzip);
 
 /** Subir esta versión fuerza reconstrucción del índice. */
-export const VERSION_INDICE = 1;
+export const VERSION_INDICE = 2;
 
 export const FICHERO_REGISTROS = 'registros.ndjson.gz';
 export const FICHERO_MARCAS = 'marcas.json';

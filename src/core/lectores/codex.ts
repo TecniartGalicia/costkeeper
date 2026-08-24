@@ -118,7 +118,7 @@ export async function leerRollout(
     cacheEscritura5m: total.escritura,
     cacheEscritura1h: 0,
     razonamiento: total.razon,
-    fuente: ruta,
+    fuentes: [ruta],
   };
 
   return {

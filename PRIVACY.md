@@ -1,6 +1,6 @@
 # Privacy
 
-CostKeeper is local software. It does not collect telemetry, it has no account and it makes no network request other than the licence check described below.
+CostKeeper is local software. It does not collect telemetry, it has no account and it makes no network request at all.
 
 ## What it reads
 
@@ -22,13 +22,7 @@ There is no field for free text. Prompts, answers, file contents and edited file
 
 ## What leaves your computer
 
-Nothing, unless you buy Pro. When you enter a licence key, these go to Polar (the merchant of record) to activate and validate it:
-
-- the licence key,
-- this computer's host name, as the activation label,
-- your operating system and the extension version.
-
-No project name, no path, no figure from your history. Validation is repeated at most once a day and works offline for 14 days.
+Nothing. This release ships free and makes no network request; the licensing code is present but switched off. If a paid tier is ever enabled, this section will say exactly what is sent and when, before it is.
 
 ## Exports
 

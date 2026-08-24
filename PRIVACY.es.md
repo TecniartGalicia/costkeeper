@@ -1,6 +1,6 @@
 # Privacidad
 
-CostKeeper es software local. No recoge telemetría, no tiene cuenta y no hace ninguna petición de red salvo la comprobación de licencia que se describe abajo.
+CostKeeper es software local. No recoge telemetría, no tiene cuenta y no hace ninguna petición de red.
 
 ## Qué lee
 
@@ -22,13 +22,7 @@ No hay ningún campo de texto libre. Los prompts, las respuestas, el contenido d
 
 ## Qué sale de tu equipo
 
-Nada, salvo que compres Pro. Al introducir una clave de licencia, a Polar (el vendedor registrado) se envía, para activarla y validarla:
-
-- la clave de licencia,
-- el nombre de este equipo, como etiqueta de la activación,
-- tu sistema operativo y la versión de la extensión.
-
-Ni un nombre de proyecto, ni una ruta, ni una cifra de tu histórico. La validación se repite como mucho una vez al día y funciona sin conexión durante 14 días.
+Nada. Esta versión es gratuita y no hace ninguna petición de red; el código de licencias está presente pero apagado. Si algún día se activa una versión de pago, esta sección dirá exactamente qué se envía y cuándo, antes de que se envíe.
 
 ## Exportaciones
 

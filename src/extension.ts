@@ -7,9 +7,13 @@ import { Panel } from './ui/panel';
 import { BarraEstado } from './ui/barraEstado';
 import { avisarPresupuestos, etiquetarCliente, exportarCsv, ponerPresupuesto, recorteGratis } from './pro/features';
 import { activateLicenseCommand, isPro, deactivateLicenseCommand } from './pro/licenseService';
+import { PRO_ACTIVO } from './pro/polarConfig';
 import { leerAjustes } from './vscode/ajustes';
 
 export async function activate(ctx: vscode.ExtensionContext): Promise<void> {
+  // Mientras la extensión sea gratis, los comandos de licencia no salen en la paleta.
+  void vscode.commands.executeCommand('setContext', 'costkeeper.proDisponible', PRO_ACTIVO);
+
   const estado = new Estado(ctx.globalStorageUri.fsPath);
   const barra = new BarraEstado(estado);
   ctx.subscriptions.push(estado, barra);

@@ -45,7 +45,7 @@ export interface PolarConfig {
 }
 
 export type ProDecision =
-  | { pro: true; source: 'dev' | 'validated' | 'grace' }
+  | { pro: true; source: 'dev' | 'validated' | 'grace' | 'free' }
   | { pro: false; reason: 'no-key' | 'not-configured' | 'invalid' | 'expired' | 'grace-expired' | 'revoked' | 'activation-removed' | 'network' };
 
 /** Maps a persisted non-"granted" status to the reason shown to the user. */

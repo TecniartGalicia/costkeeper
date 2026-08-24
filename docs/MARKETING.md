@@ -8,7 +8,7 @@ Los publica una persona. Yo redacto.
 
 **Cuña (lo que nadie más tiene):** la deduplicación por `message.id`. Es la única afirmación del producto que es a la vez cierta, verificable en una captura y sorprendente. Todo lo demás —multiproveedor, caché por TTL, cuota real— refuerza esa idea: *aquí las cifras están bien*.
 
-**Lo que se vende:** el reparto por cliente y la exportación para facturar. El contador va gratis porque compite con veinticinco gratuitos; lo que se paga es lo que un autónomo recupera la primera vez que factura un mes.
+**Precio:** gratis, todo incluido. El código de licencias está apagado tras un interruptor. Si algún día se cobra, será por el reparto por cliente y la exportación para facturar, que es lo que un autónomo recupera la primera vez que factura un mes; el contador seguirá siendo gratis porque compite con veinticinco gratuitos.
 
 **Público, por orden:**
 
@@ -48,7 +48,7 @@ Ese último párrafo es deliberado: invita a la corrección en vez de vender, qu
 
 1. Most Claude Code cost trackers overcount by more than 2×. A message is written to the transcript once per content block, and every copy repeats the full usage object. 192,262 lines → 92,666 actual messages on my history.
 2. Counting lines: $66,006. Counting messages: $29,087. Same data. Dedupe by message.id and the number is right. 1-hour cache writes also cost 2× the 5-minute ones — another 10.3 % nobody splits.
-3. Put it in a free VS Code extension: Claude Code + Codex in one table, cost per project, model and day, local only, no account. Pro adds client tagging and CSV for invoicing. [link]
+3. Put it in a free VS Code extension: Claude Code + Codex in one table, cost per project, model and day, client tagging and CSV for invoicing. Local only, no account, no network. [link]
 
 ## dev.to / Hacker News
 

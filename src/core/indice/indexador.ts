@@ -94,19 +94,28 @@ export function fundir(ind: Indice, r: Registro): void {
     ind.registros.set(r.id, r);
     return;
   }
+  // Las fuentes se acumulan aunque gane un lado u otro: son de dónde vive el
+  // mensaje, no de qué cifras se quedan.
+  const fuentes = [...new Set([...previo.fuentes, ...r.fuentes])];
   if (r.proveedor === 'codex') {
-    ind.registros.set(r.id, r);
+    ind.registros.set(r.id, { ...r, fuentes });
     return;
   }
   const mayorSalida = r.salida > previo.salida;
   const igualSalida = r.salida === previo.salida && entradaTotal(r) > entradaTotal(previo);
-  if (mayorSalida || igualSalida) ind.registros.set(r.id, r);
+  ind.registros.set(r.id, mayorSalida || igualSalida ? { ...r, fuentes } : { ...previo, fuentes });
 }
 
 const entradaTotal = (r: Registro): number => r.entrada + r.cacheLectura + r.cacheEscritura5m + r.cacheEscritura1h;
 
+/** Quita un fichero de los registros; solo se borra el que se queda sin ninguno. */
 export function purgarFuente(ind: Indice, ruta: string): void {
-  for (const [id, r] of ind.registros) if (r.fuente === ruta) ind.registros.delete(id);
+  for (const [id, r] of ind.registros) {
+    if (!r.fuentes.includes(ruta)) continue;
+    const quedan = r.fuentes.filter((f) => f !== ruta);
+    if (quedan.length) ind.registros.set(id, { ...r, fuentes: quedan });
+    else ind.registros.delete(id);
+  }
 }
 
 /** Ficheros que ya no existen: fuera sus registros y su marca. */

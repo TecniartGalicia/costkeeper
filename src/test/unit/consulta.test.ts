@@ -22,7 +22,7 @@ const reg = (o: Partial<Registro> = {}): Registro => ({
   cacheEscritura5m: 0,
   cacheEscritura1h: 0,
   razonamiento: 0,
-  fuente: 'f',
+  fuentes: ['f'],
   ...o,
 });
 
